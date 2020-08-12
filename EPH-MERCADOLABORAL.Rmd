@@ -1,5 +1,6 @@
 ---
 title: "Mercado Laboral Argetina"
+sutitle: "1 Trimestre 2020"
 author: "Natalia Esquenazi"
 date: "12/8/2020"
 output: html_document
@@ -15,15 +16,102 @@ library(dplyr)
 library(readxl)
 usu_hogar_T120 <- read_excel("~/EPH/usu_hogar_T120.xlsx")
 View(usu_hogar_T120)
+usu_individual_T120 <- read_excel("~/EPH/usu_individual_T120.xlsx")
+View(usu_individual_T120)
+Aglomerados_EPH <- read_excel("~/EPH/Aglomerados EPH.xlsx")
+View(Aglomerados_EPH)
+
+#Vemos algunos detalles de la base 
+str(usu_individual_T120)
+names(usu_individual_T120)
 ```
+
+## Basado en el Curso de R de Natsumi S. Shokida
+### Creamos una tabla con los niveles de:
+
+Población
+Ocupados
+Desocupados
+PEA
+Ocupados demandantes
+Subocupados (demandantes, no demandantes y total)
+Estos niveles nos van a permitir calcular las tasas de forma sencilla.
 
 ```{r bases1, include=FALSE, warning=FALSE, message=FALSE}
+#Creamos los ocupados 
 
-
-
-
+Poblacion_ocupados <- usu_individual_T120 %>% 
+  summarise(Poblacion         = sum(PONDERA),
+            Ocupados          = sum(PONDERA[ESTADO == 1]))
+Poblacion_ocupados
 
 ```
 
-## Analizando el Mercado Laboral en Argentina 
+```{r bases2, include=FALSE, warning=FALSE, message=FALSE}
+#Creamos la tasa de empleo
+
+Empleo <- usu_individual_T120 %>% 
+  summarise(Poblacion         = sum(PONDERA),
+            Ocupados          = sum(PONDERA[ESTADO == 1]),
+            Tasa_Empleo    = Ocupados/Poblacion)
+Empleo <- Empleo %>% 
+  select(-(1:2))
+Empleo
+
+```
+
+
+```{r bases3, include=FALSE, warning=FALSE, message=FALSE}
+#Recreamos el cuadro 1.1 de EPH INDEC
+####Cuadro 1.1 Principales indicadores. Total 31 aglomerados u
+
+Cuadro_1.1a <- usu_individual_T120 %>%  
+  summarise(Poblacion         = sum(PONDERA),
+            Ocupados          = sum(PONDERA[ESTADO == 1]), #ocupados
+            Desocupados       = sum(PONDERA[ESTADO == 2]), #desocupados
+            PEA               = Ocupados + Desocupados,
+            Ocupados_demand   = sum(PONDERA[ESTADO == 1 & PP03J ==1]), #ocupado y busco otro empleo
+            Suboc_demandante  = sum(PONDERA[ESTADO == 1 & INTENSI ==1 & PP03J==1]), #ocupados, buscan otro empleo, subocupados x insuficiencia horaria
+            Suboc_no_demand   = sum(PONDERA[ESTADO == 1 & INTENSI ==1 & PP03J %in% c(2,9)]), #ocupado, subocupados x insuficiencia horaria, no busco o ns/nc otro empleo
+            Subocupados       = Suboc_demandante + Suboc_no_demand, #creamos coeficientes para cada variable 
+            'Tasa Actividad'                  = PEA/Poblacion,
+            'Tasa Empleo'                     = Ocupados/Poblacion,
+            'Tasa Desocupacion'               = Desocupados/PEA,
+            'Tasa ocupados demandantes'       = Ocupados_demand/PEA,
+            'Tasa Subocupación'               = Subocupados/PEA,
+            'Tasa Subocupación demandante'    = Suboc_demandante/PEA,
+            'Tasa Subocupación no demandante' = Suboc_no_demand/PEA) 
+Cuadro_1.1a 
+```
+
+```{r bases4, include=FALSE, warning=FALSE, message=FALSE}
+Cuadro_1.1a <- Cuadro_1.1a %>% 
+  select(-c(1:8))
+Cuadro_1.1a
+```
+
+```{r bases5, include=FALSE, warning=FALSE, message=FALSE}
+#Damos vuelta la tabla 
+Cuadro_1.1a <- Cuadro_1.1a %>% 
+  gather(Tasas, Valor, 1:ncol(.))
+Cuadro_1.1a
+```
+
+
+```{r bases6, include=FALSE, warning=FALSE, message=FALSE}
+
+Cuadro_1.1a <- Cuadro_1.1a %>% 
+  mutate(Valor = sprintf("%1.1f%%", 100*Valor))
+Cuadro_1.1a
+```
+
+
+
+
+
+
+
+
+
+
 
