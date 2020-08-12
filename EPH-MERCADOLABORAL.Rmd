@@ -1,0 +1,29 @@
+---
+title: "Mercado Laboral Argetina"
+author: "Natalia Esquenazi"
+date: "12/8/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r bases, include=FALSE, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(dplyr)
+library(readxl)
+usu_hogar_T120 <- read_excel("~/EPH/usu_hogar_T120.xlsx")
+View(usu_hogar_T120)
+```
+
+```{r bases1, include=FALSE, warning=FALSE, message=FALSE}
+
+
+
+
+
+```
+
+## Analizando el Mercado Laboral en Argentina 
+
