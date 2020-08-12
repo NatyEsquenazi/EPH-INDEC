@@ -5,5 +5,5 @@ library(readxl)
 usu_hogar_T120 <- read_excel("~/EPH/usu_hogar_T120.xlsx")
 View(usu_hogar_T120)
 
-
+Esta linea la agregue en remoto
 
